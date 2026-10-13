@@ -19,6 +19,13 @@ config/icon="res://icon.svg"
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
 
+[file_customization]
+
+folder_colors={
+"res://art/": "pink",
+"res://scenes/": "yellow"
+}
+
 [input]
 
 move_forward={
