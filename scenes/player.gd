@@ -1,8 +1,14 @@
 extends CharacterBody3D
 
+@onready var camera: Node3D = $Camera
+
 const GRAVITY = 20
 
 @export var speed : int = 5
+
+
+func _ready() -> void:
+	add_to_group("Player")
 
 
 func _physics_process(delta: float) -> void:
@@ -17,15 +23,14 @@ func apply_gravity(delta) -> void:
 
 
 func handle_horizontal_movement() -> void:
-	var dir := Input.get_vector("move_left", "move_right", "move_forward", "move_backward").normalized()
-	var horizontal := Vector2.ZERO
+	var InputDir := Input.get_vector("move_left", "move_right", "move_forward", "move_backward")
+	var direction := InputDir.rotated(- camera.rotation.y)
 	
-	if dir:
-		horizontal.x = dir.x * speed
-		horizontal.y = dir.y * speed
+	if InputDir:
+		velocity.x = direction.x * speed
+		velocity.z = direction.y * speed
 	
 	else: 
-		horizontal = Vector2.ZERO
+		velocity.x = move_toward(velocity.x, 0.0, speed)
+		velocity.z = move_toward(velocity.z, 0.0, speed)
 	
-	velocity.x = horizontal.x
-	velocity.z = horizontal.y
