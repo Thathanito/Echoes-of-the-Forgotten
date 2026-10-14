@@ -1,0 +1,28 @@
+[gd_scene format=3 uid="uid://d01d53edojk5w"]
+
+[ext_resource type="PackedScene" uid="uid://cvq7vf8i1nef" path="res://art/Assets/Characters glb/Ranger.glb" id="1_pxsnc"]
+[ext_resource type="AnimationLibrary" uid="uid://cpdp4b65vrw7w" path="res://art/Animations/Library/PlayerAnimations.res" id="2_tfruq"]
+
+[node name="RangerMesh" unique_id=1011394754 instance=ExtResource("1_pxsnc")]
+
+[node name="Skeleton3D" parent="Rig_Medium" parent_id_path=PackedInt32Array(1150633880) index="0" unique_id=203348692]
+bones/2/rotation = Quaternion(0.9998491, -7.13275e-08, -1.20427455e-08, 0.017373193)
+bones/3/rotation = Quaternion(0.10622513, 6.8652206e-08, -7.376967e-08, 0.99434215)
+bones/4/rotation = Quaternion(-0.45523903, 1.619773e-08, -3.435674e-08, 0.8903693)
+bones/5/rotation = Quaternion(4.775981e-08, 0.92035496, -0.3910841, 5.8015768e-08)
+bones/6/rotation = Quaternion(0.9998491, 7.426558e-08, -3.1726263e-08, 0.017373193)
+bones/7/rotation = Quaternion(0.10622513, -6.865223e-08, 7.376966e-08, 0.99434215)
+bones/8/rotation = Quaternion(-0.45523903, 1.6598169e-07, 2.2507123e-09, 0.8903693)
+bones/9/rotation = Quaternion(2.1219835e-08, 0.92035496, -0.3910841, 6.450607e-08)
+bones/13/rotation = Quaternion(-0.51412165, 0.48546773, 0.48546776, 0.5141218)
+bones/14/rotation = Quaternion(1.49426e-09, 6.228117e-08, 0.055285532, 0.99847066)
+bones/16/rotation = Quaternion(1.1999162e-09, -9.210969e-08, 5.4551956e-06, 1)
+bones/17/rotation = Quaternion(1.6805921e-09, -1.6805919e-09, 0.7071068, 0.7071067)
+bones/18/rotation = Quaternion(-0.5141216, -0.48546767, -0.48546773, 0.5141217)
+bones/19/rotation = Quaternion(1.4942605e-09, -6.228117e-08, -0.055285532, 0.99847066)
+bones/21/rotation = Quaternion(1.2001637e-09, 1.3589292e-07, -5.4551956e-06, 1)
+bones/22/rotation = Quaternion(1.6806122e-09, 1.680612e-09, -0.7071068, 0.7071067)
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." index="1" unique_id=939759346]
+libraries/PlayerAnimations = ExtResource("2_tfruq")
+autoplay = &"PlayerAnimations/T-Pose"
