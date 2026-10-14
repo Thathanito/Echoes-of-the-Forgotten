@@ -58,14 +58,23 @@ func handle_rotation(input_dir: Vector2, dir: Vector2, delta: float) -> void:
 				last_target_yaw = atan2(dir.x, dir.y)
 			STATES.RUN:
 				last_target_yaw = camera.global_rotation.y + PI
+				get_tree().call_group("PlayerMesh", "handle_blend_space", input_dir, delta)
+			STATES.RUN:
+				last_target_yaw = 0.0
 
 	mesh.global_rotation.y = lerp_angle(mesh.global_rotation.y, last_target_yaw, mesh_rotation_speed * delta)
 
 
 func debug() -> void:
+	var anim : String
 	if Input.is_action_just_pressed("ui_accept"):
 		match current_state:
+			STATES.IDLE:
+				current_state = STATES.RUN
+				anim = "Locomotion"
 			STATES.WALK:
 				current_state = STATES.RUN
 			STATES.RUN:
-				current_state = STATES.WALK
+				current_state = STATES.IDLE
+				anim = "Idle"
+	get_tree().call_group("PlayerMesh", "travel_state", anim)

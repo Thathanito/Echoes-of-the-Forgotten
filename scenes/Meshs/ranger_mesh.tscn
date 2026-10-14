@@ -1,28 +1,91 @@
 [gd_scene format=3 uid="uid://d01d53edojk5w"]
 
 [ext_resource type="PackedScene" uid="uid://cvq7vf8i1nef" path="res://art/Assets/Characters glb/Ranger.glb" id="1_pxsnc"]
+[ext_resource type="Script" uid="uid://g0d1chytsspr" path="res://scenes/Meshs/ranger_mesh.gd" id="2_ggdxe"]
 [ext_resource type="AnimationLibrary" uid="uid://cpdp4b65vrw7w" path="res://art/Animations/Library/PlayerAnimations.res" id="2_tfruq"]
 
-[node name="RangerMesh" unique_id=1011394754 instance=ExtResource("1_pxsnc")]
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_tfruq"]
+animation = &"PlayerAnimations/Idle_A"
 
-[node name="Skeleton3D" parent="Rig_Medium" parent_id_path=PackedInt32Array(1150633880) index="0" unique_id=203348692]
-bones/2/rotation = Quaternion(0.9998491, -7.13275e-08, -1.20427455e-08, 0.017373193)
-bones/3/rotation = Quaternion(0.10622513, 6.8652206e-08, -7.376967e-08, 0.99434215)
-bones/4/rotation = Quaternion(-0.45523903, 1.619773e-08, -3.435674e-08, 0.8903693)
-bones/5/rotation = Quaternion(4.775981e-08, 0.92035496, -0.3910841, 5.8015768e-08)
-bones/6/rotation = Quaternion(0.9998491, 7.426558e-08, -3.1726263e-08, 0.017373193)
-bones/7/rotation = Quaternion(0.10622513, -6.865223e-08, 7.376966e-08, 0.99434215)
-bones/8/rotation = Quaternion(-0.45523903, 1.6598169e-07, 2.2507123e-09, 0.8903693)
-bones/9/rotation = Quaternion(2.1219835e-08, 0.92035496, -0.3910841, 6.450607e-08)
-bones/13/rotation = Quaternion(-0.51412165, 0.48546773, 0.48546776, 0.5141218)
-bones/14/rotation = Quaternion(1.49426e-09, 6.228117e-08, 0.055285532, 0.99847066)
-bones/16/rotation = Quaternion(1.1999162e-09, -9.210969e-08, 5.4551956e-06, 1)
-bones/17/rotation = Quaternion(1.6805921e-09, -1.6805919e-09, 0.7071068, 0.7071067)
-bones/18/rotation = Quaternion(-0.5141216, -0.48546767, -0.48546773, 0.5141217)
-bones/19/rotation = Quaternion(1.4942605e-09, -6.228117e-08, -0.055285532, 0.99847066)
-bones/21/rotation = Quaternion(1.2001637e-09, 1.3589292e-07, -5.4551956e-06, 1)
-bones/22/rotation = Quaternion(1.6806122e-09, 1.680612e-09, -0.7071068, 0.7071067)
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_ggdxe"]
+animation = &"PlayerAnimations/Running_A"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_yvaiu"]
+animation = &"PlayerAnimations/Running_Strafe_Right"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_tp1lj"]
+animation = &"PlayerAnimations/Running_Strafe_Left"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_23cth"]
+animation = &"PlayerAnimations/Walking_Backwards"
+
+[sub_resource type="AnimationNodeBlendSpace2D" id="AnimationNodeBlendSpace2D_pp05n"]
+blend_point_0/node = SubResource("AnimationNodeAnimation_ggdxe")
+blend_point_0/pos = Vector2(0, -1)
+blend_point_0/name = &"Forward"
+blend_point_1/node = SubResource("AnimationNodeAnimation_yvaiu")
+blend_point_1/pos = Vector2(1, 0)
+blend_point_1/name = &"StrafeRight"
+blend_point_2/node = SubResource("AnimationNodeAnimation_tp1lj")
+blend_point_2/pos = Vector2(-1, 0)
+blend_point_2/name = &"StrafeLeft"
+blend_point_3/node = SubResource("AnimationNodeAnimation_23cth")
+blend_point_3/pos = Vector2(0, 1)
+blend_point_3/name = &"Backward"
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_b00iw"]
+advance_mode = 2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_1mb30"]
+xfade_time = 0.2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_w2uwh"]
+xfade_time = 0.2
+
+[sub_resource type="AnimationNodeStateMachine" id="AnimationNodeStateMachine_xrivr"]
+states/Idle/node = SubResource("AnimationNodeAnimation_tfruq")
+states/Idle/position = Vector2(388, 100)
+states/Locomotion/node = SubResource("AnimationNodeBlendSpace2D_pp05n")
+states/Locomotion/position = Vector2(549, 99)
+transitions = ["Start", "Idle", SubResource("AnimationNodeStateMachineTransition_b00iw"), "Idle", "Locomotion", SubResource("AnimationNodeStateMachineTransition_1mb30"), "Locomotion", "Idle", SubResource("AnimationNodeStateMachineTransition_w2uwh")]
+
+[node name="RangerMesh" unique_id=1011394754 instance=ExtResource("1_pxsnc")]
+script = ExtResource("2_ggdxe")
+
+[node name="Skeleton3D" parent="Rig_Medium" parent_id_path=PackedInt32Array(1005905600) index="0" unique_id=426718321]
+bones/0/rotation = Quaternion(-1.6772223e-08, 0.0016782284, -4.2638812e-09, 0.9999986)
+bones/1/position = Vector3(1.0817013e-16, 0.4255513, 1.2185903e-15)
+bones/1/rotation = Quaternion(0.09315345, 0.0031211493, -0.0005268531, 0.9956468)
+bones/2/position = Vector3(0.17094506, 0.11349493, -0.013573144)
+bones/2/rotation = Quaternion(0.993892, -0.00957682, -0.008606126, 0.10960352)
+bones/3/rotation = Quaternion(0.39405435, 4.069305e-08, -2.6488829e-07, 0.9190872)
+bones/4/rotation = Quaternion(-0.3580437, -0.020871818, 0.0053301957, 0.93345636)
+bones/5/rotation = Quaternion(-0.00033035275, 0.9185422, -0.3953228, 0.00027706713)
+bones/6/position = Vector3(-0.17094506, 0.11358674, 0.013568987)
+bones/6/rotation = Quaternion(0.9838244, 0.0103664715, 0.0055189324, 0.17875011)
+bones/7/rotation = Quaternion(0.43245497, -5.0480825e-08, 2.4809773e-07, 0.9016556)
+bones/8/rotation = Quaternion(-0.4202425, 0.024703717, -0.0046156617, 0.9070637)
+bones/9/rotation = Quaternion(0.00029040262, 0.91835266, -0.3957632, -0.00024389311)
+bones/10/rotation = Quaternion(0.12827079, -0.1147895, -0.0024612464, 0.9850705)
+bones/11/rotation = Quaternion(0.06234105, -0.005482762, -0.018397814, 0.99787027)
+bones/12/rotation = Quaternion(-0.120822035, 0.11213504, -0.0088404305, 0.9862807)
+bones/13/position = Vector3(-0.20996006, 0.12364976, -0.046600815)
+bones/13/rotation = Quaternion(-0.68131465, 0.42552623, 0.5419844, 0.24696341)
+bones/14/rotation = Quaternion(-4.8514742e-08, 7.678062e-08, 0.5688108, 0.8224684)
+bones/16/rotation = Quaternion(-0.11720661, 0.39467338, 0.08007799, 0.90779024)
+bones/17/position = Vector3(-5.1385113e-10, 0.09612513, -0.057500005)
+bones/17/rotation = Quaternion(-0.036164034, 0.022833934, 0.38867706, 0.9203809)
+bones/18/position = Vector3(0.18943779, 0.1135564, -0.041624878)
+bones/18/rotation = Quaternion(-0.8304406, -0.21869539, -0.33785027, 0.38522458)
+bones/19/rotation = Quaternion(3.6578985e-08, -2.1102009e-08, -0.5790883, 0.81526494)
+bones/21/rotation = Quaternion(-0.27687436, -0.38345653, -0.120393686, 0.8728156)
+bones/22/rotation = Quaternion(-0.08928257, 0.01082805, -0.40233326, 0.9110649)
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="." index="1" unique_id=939759346]
 libraries/PlayerAnimations = ExtResource("2_tfruq")
 autoplay = &"PlayerAnimations/T-Pose"
+
+[node name="AnimationTree" type="AnimationTree" parent="." index="2" unique_id=482530672]
+tree_root = SubResource("AnimationNodeStateMachine_xrivr")
+anim_player = NodePath("../AnimationPlayer")
+parameters/Locomotion/blend_position = Vector2(-0.0032051206, 0.027707815)
