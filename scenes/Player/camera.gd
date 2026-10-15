@@ -12,6 +12,7 @@ extends Node3D
 
 
 enum CAM_STATES {IN, OUT}
+var current_state : CAM_STATES
 
 var in_arm_lenght := 3
 var in_h_offset := 0.5
@@ -22,6 +23,7 @@ var out_y_pivot_hight := 5
 
 func _ready() -> void:
 	add_to_group("Camera")
+	current_state = CAM_STATES.OUT
 
 
 func _physics_process(_delta : float):
@@ -40,13 +42,16 @@ func _unhandled_input(event: InputEvent) -> void:
 			_camera_pivot.rotation.y += -event.screen_relative.x * mouse_sensitivity
 
 
-func move_to_cam_state(state : CAM_STATES) -> void:
-	match state:
+func move_to_cam_state() -> void:
+	#invert the state to match the good environment
+	match current_state:
 		CAM_STATES.IN:
-			spring_arm_3d.spring_length = in_arm_lenght
-			camera_3d.h_offset = in_h_offset
-			_camera_pivot.position.y = in_y_pivot_hight
-		CAM_STATES.OUT:
+			current_state = CAM_STATES.OUT
 			spring_arm_3d.spring_length = out_arm_lenght
 			camera_3d.h_offset = out_h_offset
 			_camera_pivot.position.y = out_y_pivot_hight
+		CAM_STATES.OUT:
+			current_state = CAM_STATES.IN
+			spring_arm_3d.spring_length = in_arm_lenght
+			camera_3d.h_offset = in_h_offset
+			_camera_pivot.position.y = in_y_pivot_hight
