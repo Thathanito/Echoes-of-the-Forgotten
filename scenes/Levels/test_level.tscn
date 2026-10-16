@@ -5,6 +5,7 @@
 [ext_resource type="Texture2D" uid="uid://bg0cqx5ytgfgt" path="res://art/grid/Red/texture_07.png" id="2_qcd3b"]
 [ext_resource type="Texture2D" uid="uid://dkx01qkosnsru" path="res://art/grid/Purple/texture_07.png" id="3_88ety"]
 [ext_resource type="Texture2D" uid="uid://wj0x7fdtc0vq" path="res://art/grid/Green/texture_07.png" id="4_ahbqi"]
+[ext_resource type="Texture2D" uid="uid://bv00milebotso" path="res://art/grid/Orange/texture_03.png" id="6_eg032"]
 [ext_resource type="Texture2D" uid="uid://x8d2g3byhifq" path="res://art/grid/Dark/texture_03.png" id="6_qcd3b"]
 [ext_resource type="PackedScene" uid="uid://dn8so3qkysk45" path="res://scenes/Levels/in_out_area.tscn" id="7_gd42f"]
 
@@ -38,8 +39,18 @@ albedo_texture = ExtResource("6_qcd3b")
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ahbqi"]
 albedo_texture = ExtResource("6_qcd3b")
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_pj5lm"]
+albedo_texture = ExtResource("6_eg032")
+
 [sub_resource type="BoxShape3D" id="BoxShape3D_xrivr"]
-size = Vector3(3.2806091, 6.4034424, 1.3768921)
+size = Vector3(3.2806091, 6.4034424, 23.33196)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_13qdw"]
+size = Vector3(15, 5, 15)
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_xrivr"]
+height = 3.0439453
+radius = 2.8554688
 
 [node name="TestLevel" type="Node3D" unique_id=99272908]
 
@@ -75,23 +86,41 @@ use_collision = true
 polygon = PackedVector2Array(-1.686689, -0.0048804283, -1.743345, 1.081744, -0.5058485, 0.61449635, 1, 0)
 material = SubResource("StandardMaterial3D_fyxdr")
 
-[node name="CSGCombiner3D" type="CSGCombiner3D" parent="GreyBox" unique_id=1159900929]
+[node name="Couloir" type="CSGCombiner3D" parent="GreyBox" unique_id=1159900929]
 use_collision = true
 
-[node name="CSGBox3D" type="CSGBox3D" parent="GreyBox/CSGCombiner3D" unique_id=1857875829]
+[node name="CSGBox3D" type="CSGBox3D" parent="GreyBox/Couloir" unique_id=1857875829]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.625732, 2.2580385, -17.511396)
 size = Vector3(18.251465, 4.5371094, 1)
 material = SubResource("StandardMaterial3D_88ety")
 
-[node name="CSGBox3D2" type="CSGBox3D" parent="GreyBox/CSGCombiner3D" unique_id=2091480502]
+[node name="CSGBox3D2" type="CSGBox3D" parent="GreyBox/Couloir" unique_id=2091480502]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0.37426758, 2.2580385, -15.511396)
 size = Vector3(18.251465, 4.5371094, 1)
 material = SubResource("StandardMaterial3D_ahbqi")
 
-[node name="CSGBox3D3" type="CSGBox3D" parent="GreyBox/CSGCombiner3D" unique_id=1930966050]
+[node name="CSGBox3D3" type="CSGBox3D" parent="GreyBox/Couloir" unique_id=1930966050]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 3.3742676, 2.2580385, -15.511396)
 size = Vector3(18.251465, 4.5371094, 1)
 material = SubResource("StandardMaterial3D_ahbqi")
+
+[node name="Interior" type="CSGCombiner3D" parent="GreyBox" unique_id=773715937]
+use_collision = true
+
+[node name="CSGBox3D" type="CSGBox3D" parent="GreyBox/Interior" unique_id=1902193812]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 27.84378, 2.224205, 33.119415)
+size = Vector3(15, 5, 15)
+material = SubResource("StandardMaterial3D_pj5lm")
+
+[node name="CSGBox3D2" type="CSGBox3D" parent="GreyBox/Interior" unique_id=585101190]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 27.84378, 2.1294785, 33.119415)
+operation = 2
+size = Vector3(14.5, 4.189453, 14.5)
+
+[node name="CSGBox3D3" type="CSGBox3D" parent="GreyBox/Interior" unique_id=587118734]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 25.38821, 1.4393561, 25.791607)
+operation = 2
+size = Vector3(2.1645508, 3.0655518, 1)
 
 [node name="Player" parent="." unique_id=1276695921 instance=ExtResource("1_2venv")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.09358, 0)
@@ -103,10 +132,16 @@ mesh_rotation_speed = 7.5
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.8890648, 2.992301, -24.832672)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Areas/InOutArea" unique_id=331662507]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 9.15796)
 shape = SubResource("BoxShape3D_xrivr")
 
-[node name="InOutArea2" parent="Areas" unique_id=154461825 instance=ExtResource("7_gd42f")]
+[node name="InOutArea2" parent="Areas" unique_id=1618266128 instance=ExtResource("7_gd42f")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 27.83661, 0, 33.434048)
 
-[node name="CollisionShape3D2" type="CollisionShape3D" parent="Areas/InOutArea2" unique_id=1101699579]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.8890648, 2.992301, -6.2614098)
-shape = SubResource("BoxShape3D_xrivr")
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Areas/InOutArea2" unique_id=1439841197]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5635242, -0.3563347)
+shape = SubResource("BoxShape3D_13qdw")
+
+[node name="CollisionShape3D2" type="CollisionShape3D" parent="Areas/InOutArea2" unique_id=2052919797]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.384945, 1.5603447, -8.384132)
+shape = SubResource("CylinderShape3D_xrivr")

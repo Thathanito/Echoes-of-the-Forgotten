@@ -4,6 +4,8 @@
 
 [node name="Camera" type="Node3D" unique_id=618735137]
 script = ExtResource("1_cvpoc")
+tween_in_duration = 0.75
+tween_out_duration = 1.5
 
 [node name="SpringArm3D" type="SpringArm3D" parent="." unique_id=1097602941]
 spring_length = 10.0
