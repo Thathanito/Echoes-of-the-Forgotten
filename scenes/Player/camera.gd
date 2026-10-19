@@ -14,21 +14,28 @@ extends Node3D
 enum CAM_STATES {IN, OUT}
 var current_state : CAM_STATES
 
-var in_arm_lenght := 3
-var in_h_offset := 0.5
-var in_y_pivot_hight := Vector3(0.0, 2.5, 0.0)
-var out_arm_lenght := 7
-var out_h_offset := 2.5
-var out_y_pivot_hight := Vector3(0.0, 5.0, 0.0)
+var in_dict := {
+	"arm_lenght" : 3.0,
+	"h_offset" : 0.75,
+	"y_pivot_hight" : Vector3(0.0, 2.5, 0.0)
+	}
+
+var out_dict := {
+	"arm_lenght" : 7.0,
+	"h_offset" : 2.0,
+	"y_pivot_hight" : Vector3(0.0, 5.5, 0.0)
+	}
 
 var tween := create_tween()
 @export var tween_in_duration : float
 @export var tween_out_duration : float
 
+@export var follow_smoothing := 10.0
+
 func _ready() -> void:
 	add_to_group("Camera")
 	current_state = CAM_STATES.OUT
-	ease_out()
+	_ease(false)
 
 
 func _physics_process(_delta : float):
@@ -50,25 +57,30 @@ func _unhandled_input(event: InputEvent) -> void:
 func move_to_cam_state(state : CAM_STATES) -> void:
 	match state:
 		CAM_STATES.IN:
-			ease_in()
+			current_state = CAM_STATES.IN
+			_ease(true)
 		CAM_STATES.OUT:
-			ease_out()
+			current_state = CAM_STATES.OUT
+			_ease(false)
 
 
-func ease_in() -> void:
+func _ease(state : bool) -> void:
 	reset_tween()
+	
+	var dict_name = in_dict if state else out_dict
+	var duration = tween_in_duration if state else tween_out_duration
+	
 	tween.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT).set_parallel(true)
-	tween.tween_property(spring_arm_3d, "spring_length", in_arm_lenght, tween_in_duration)
-	tween.tween_property(camera_3d, "h_offset", in_h_offset, tween_in_duration)
-	tween.tween_property(_camera_pivot, "position", in_y_pivot_hight, tween_in_duration)
+	tween.tween_property(spring_arm_3d, "spring_length", dict_name["arm_lenght"], duration)
+	tween.tween_property(camera_3d, "h_offset", dict_name["h_offset"], duration)
+	tween.tween_property(_camera_pivot, "position", dict_name["y_pivot_hight"].y, duration)
 
 
-func ease_out() -> void:
-	reset_tween()
-	tween.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT).set_parallel(true)
-	tween.tween_property(spring_arm_3d, "spring_length", out_arm_lenght, tween_out_duration)
-	tween.tween_property(camera_3d, "h_offset", out_h_offset, tween_out_duration)
-	tween.tween_property(_camera_pivot, "position", out_y_pivot_hight, tween_out_duration)
+func cam_following(player_pos : Vector3, delta : float) -> void:
+	var follow_offset = in_dict["y_pivot_hight"] if current_state == CAM_STATES.IN else out_dict["y_pivot_hight"]
+	var target = player_pos + follow_offset
+	var weight := 1.0 - exp(-follow_smoothing * delta)
+	global_position = global_position.lerp(target, weight)
 
 
 func reset_tween() -> void:

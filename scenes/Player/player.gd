@@ -33,6 +33,8 @@ func _physics_process(delta: float) -> void:
 	handle_rotation(InputDir, direction, delta)
 	handle_anim()
 	
+	handle_camera_smoothness(delta)
+	
 	debug()
 	
 	move_and_slide()
@@ -94,6 +96,9 @@ func move_to_state(state : STATES) -> void:
 func handle_anim() -> void:
 		get_tree().call_group("PlayerMesh", "travel_state", current_anim)
 
+
+func handle_camera_smoothness(delta : float) -> void:
+	get_tree().call_group("Camera", "cam_following", position, delta)
 
 func debug() -> void:
 	if Input.is_action_just_pressed("ui_accept"):
