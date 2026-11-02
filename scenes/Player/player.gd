@@ -18,12 +18,17 @@ var last_target_yaw := 0.0
 enum STATES {IDLE, WALK, RUN}
 var current_state : STATES
 
+#Rotation_modes
+enum RMODE {FREE, LOCK}
+var current_rmode : RMODE
+
 var anims := ["Idle", "Walk", "Locomotion"]
 var current_anim : String
 
 func _ready() -> void:
 	add_to_group("Player")
 	current_state = STATES.WALK
+	current_rmode = RMODE.FREE
 
 
 func _physics_process(delta: float) -> void:
@@ -69,14 +74,12 @@ func handle_horizontal_movement() -> void:
 func handle_rotation(input_dir: Vector2, dir: Vector2, delta: float) -> void:
 
 	if input_dir != Vector2.ZERO:
-		match current_state:
-			STATES.WALK:
+		match current_rmode:
+			RMODE.FREE:
 				last_target_yaw = atan2(dir.x, dir.y)
-			STATES.RUN:
+			RMODE.LOCK:
 				last_target_yaw = camera.global_rotation.y + PI
 				get_tree().call_group("PlayerMesh", "handle_blend_space", input_dir, delta)
-			STATES.RUN:
-				last_target_yaw = 0.0
 
 	mesh.global_rotation.y = lerp_angle(mesh.global_rotation.y, last_target_yaw, mesh_rotation_speed * delta)
 
@@ -102,4 +105,8 @@ func handle_camera_smoothness(delta : float) -> void:
 
 func debug() -> void:
 	if Input.is_action_just_pressed("ui_accept"):
-		pass
+		match current_rmode:
+			RMODE.FREE:
+				current_rmode = RMODE.LOCK
+			RMODE.LOCK:
+				current_rmode = RMODE.FREE
