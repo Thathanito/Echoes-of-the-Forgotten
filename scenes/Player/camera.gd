@@ -39,26 +39,38 @@ func _ready() -> void:
 	_ease(false)
 
 
-func _physics_process(_delta : float):
+func _physics_process(delta : float):
 	if Input.is_action_just_pressed("ui_cancel"):
 		if Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED:
 			Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 		else:
 			Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+	
+	if Settings.current_input_device == 1:
+		controller_input(delta)
 
 
 #mouse
 func _unhandled_input(event: InputEvent) -> void:
-	if event is InputEventMouseMotion and Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED:
-		if event is InputEventMouseMotion:
-			_camera_pivot.rotation.x -= event.screen_relative.y * Settings.mouse_sensitivity
-			_camera_pivot.rotation.x = clampf(_camera_pivot.rotation.x, min_tilt_limit, max_tilt_limit)
-			_camera_pivot.rotation.y += -event.screen_relative.x * Settings.mouse_sensitivity
+	if Settings.current_input_device == 0:
+		if event is InputEventMouseMotion and Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED:
+			if event is InputEventMouseMotion:
+				_camera_pivot.rotation.x -= event.screen_relative.y * Settings.mouse_sensitivity
+				_camera_pivot.rotation.x = clampf(_camera_pivot.rotation.x, min_tilt_limit, max_tilt_limit)
+				_camera_pivot.rotation.y += -event.screen_relative.x * Settings.mouse_sensitivity
 
 
 #controller
-func controller_input() -> void:
-	pass
+func controller_input(delta) -> void:
+	var joy_dir := Input.get_vector("pan_left", "pan_right", "pan_up", "pan_down")
+	rotate_from_vector(joy_dir * delta * Vector2(Settings.horizontal_acceleration_controler, Settings.vertical_acceleration_controler))
+
+
+func rotate_from_vector(v : Vector2) -> void:
+	if v.length():
+		_camera_pivot.rotation.y -= v.x
+		_camera_pivot.rotation.x -= v.y
+		_camera_pivot.rotation.x = clampf(_camera_pivot.rotation.x, min_tilt_limit, max_tilt_limit)
 
 func move_to_cam_state(state : CAM_STATES) -> void:
 	match state:
