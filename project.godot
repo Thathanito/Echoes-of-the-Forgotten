@@ -14,6 +14,10 @@ config/name="Echoes of the Forgotten"
 config/features=PackedStringArray("4.7", "Forward Plus")
 config/icon="res://icon.svg"
 
+[autoload]
+
+Settings="*uid://blm0sscw5ws2f"
+
 [display]
 
 window/stretch/mode="canvas_items"

@@ -22,7 +22,7 @@ var current_state : STATES
 enum RMODE {FREE, LOCK}
 var current_rmode : RMODE
 
-var anims := ["Idle", "Walk", "Locomotion"]
+var anims := ["Idle", "Walk", "Run", "Locked"]
 var current_anim : String
 
 func _ready() -> void:
@@ -35,7 +35,7 @@ func _physics_process(delta: float) -> void:
 	apply_gravity(delta)
 	handle_horizontal_movement()
 	
-	handle_rotation(InputDir, direction, delta)
+	handle_rotation(delta)
 	handle_anim()
 	
 	handle_camera_smoothness(delta)
@@ -57,8 +57,8 @@ func handle_horizontal_movement() -> void:
 	if InputDir:
 		var speed : int
 		if Input.is_action_pressed("Run"):
-			move_to_state(STATES.RUN)
 			speed = run_speed
+			move_to_state(STATES.RUN)
 		else:
 			move_to_state(STATES.WALK)
 			speed = base_speed
@@ -71,15 +71,15 @@ func handle_horizontal_movement() -> void:
 		velocity.z = move_toward(velocity.z, 0.0, base_speed)
 
 
-func handle_rotation(input_dir: Vector2, dir: Vector2, delta: float) -> void:
+func handle_rotation(delta: float) -> void:
 
-	if input_dir != Vector2.ZERO:
+	if InputDir != Vector2.ZERO:
 		match current_rmode:
 			RMODE.FREE:
-				last_target_yaw = atan2(dir.x, dir.y)
+				last_target_yaw = atan2(direction.x, direction.y)
 			RMODE.LOCK:
 				last_target_yaw = camera.global_rotation.y + PI
-				get_tree().call_group("PlayerMesh", "handle_blend_space", input_dir, delta)
+				get_tree().call_group("PlayerMesh", "handle_blend_space", InputDir, delta)
 
 	mesh.global_rotation.y = lerp_angle(mesh.global_rotation.y, last_target_yaw, mesh_rotation_speed * delta)
 
@@ -93,7 +93,10 @@ func move_to_state(state : STATES) -> void:
 				current_anim = anims[1]
 			STATES.RUN:
 				current_state = STATES.RUN
-				current_anim = anims[2]
+				if current_rmode == RMODE.FREE:
+					current_anim = anims[2]
+				else:
+					current_anim = anims[3]
 
 
 func handle_anim() -> void:
@@ -101,7 +104,7 @@ func handle_anim() -> void:
 
 
 func handle_camera_smoothness(delta : float) -> void:
-	get_tree().call_group("Camera", "cam_following", position, delta)
+	get_tree().call_group("Camera", "cam_following", global_position, delta)
 
 func debug() -> void:
 	if Input.is_action_just_pressed("ui_accept"):

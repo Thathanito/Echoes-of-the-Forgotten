@@ -6,7 +6,6 @@ extends Node3D
 @onready var camera_3d: Camera3D = $SpringArm3D/Camera3D
 
 
-@export_range(0.1, 1.0) var mouse_sensitivity = 0.002
 @export var max_tilt_limit := deg_to_rad(30)
 @export var min_tilt_limit := deg_to_rad(-45)
 
@@ -48,13 +47,18 @@ func _physics_process(_delta : float):
 			Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 
 
+#mouse
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion and Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED:
 		if event is InputEventMouseMotion:
-			_camera_pivot.rotation.x -= event.screen_relative.y * mouse_sensitivity
+			_camera_pivot.rotation.x -= event.screen_relative.y * Settings.mouse_sensitivity
 			_camera_pivot.rotation.x = clampf(_camera_pivot.rotation.x, min_tilt_limit, max_tilt_limit)
-			_camera_pivot.rotation.y += -event.screen_relative.x * mouse_sensitivity
+			_camera_pivot.rotation.y += -event.screen_relative.x * Settings.mouse_sensitivity
 
+
+#controller
+func controller_input() -> void:
+	pass
 
 func move_to_cam_state(state : CAM_STATES) -> void:
 	match state:
