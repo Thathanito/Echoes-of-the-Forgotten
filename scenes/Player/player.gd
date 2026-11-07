@@ -5,6 +5,7 @@ extends CharacterBody3D
 
 
 const GRAVITY = 20
+@export var jump_force := 10
 
 var direction : Vector2
 var InputDir : Vector2
@@ -15,7 +16,7 @@ var InputDir : Vector2
 var last_target_yaw := 0.0 
 
 #States
-enum STATES {IDLE, WALK, RUN}
+enum STATES {IDLE, WALK, RUN, JUMP}
 var current_state : STATES
 
 #Rotation_modes
@@ -32,7 +33,7 @@ func _ready() -> void:
 
 
 func _physics_process(delta: float) -> void:
-	apply_gravity(delta)
+	handle_vertical_movement(delta)
 	handle_horizontal_movement()
 	
 	handle_rotation(delta)
@@ -48,13 +49,23 @@ func _physics_process(delta: float) -> void:
 func apply_gravity(delta) -> void:
 	if ! is_on_floor():
 		velocity.y -= GRAVITY * delta
+	else:
+		move_to_state(STATES.IDLE)
+
+
+func handle_vertical_movement(delta) -> void:
+	apply_gravity(delta)
+	
+	if Input.is_action_just_pressed("jump") and is_on_floor():
+		move_to_state(STATES.JUMP)
+		velocity.y = jump_force
 
 
 func handle_horizontal_movement() -> void:
 	InputDir = Input.get_vector("move_left", "move_right", "move_forward", "move_backward")
 	direction = InputDir.rotated(- camera.rotation.y)
 	
-	if InputDir:
+	if InputDir and current_state != STATES.JUMP:
 		var speed : int
 		if Input.is_action_pressed("Run"):
 			speed = run_speed
@@ -66,9 +77,10 @@ func handle_horizontal_movement() -> void:
 		velocity.z = direction.y * speed
 		
 	else: 
-		move_to_state(STATES.IDLE)
-		velocity.x = move_toward(velocity.x, 0.0, base_speed)
-		velocity.z = move_toward(velocity.z, 0.0, base_speed)
+		if current_state != STATES.JUMP:
+			move_to_state(STATES.IDLE)
+			velocity.x = move_toward(velocity.x, 0.0, base_speed)
+			velocity.z = move_toward(velocity.z, 0.0, base_speed)
 
 
 func handle_rotation(delta: float) -> void:
@@ -97,6 +109,8 @@ func move_to_state(state : STATES) -> void:
 					current_anim = anims[2]
 				else:
 					current_anim = anims[3]
+			STATES.JUMP:
+				current_state = STATES.JUMP
 
 
 func handle_anim() -> void:
