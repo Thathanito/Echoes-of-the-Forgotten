@@ -95,7 +95,7 @@ func _ease(state : bool) -> void:
 
 
 func cam_following(player_pos : Vector3, delta : float) -> void:
-	var target := player_pos + Vector3(0.0, y_offset, 0.0)
+	var target := Vector3(player_pos.x, y_offset, player_pos.z)
 	var weight := 1.0 - exp(-follow_smoothing * delta)
 	global_position = global_position.lerp(target, weight)
 
