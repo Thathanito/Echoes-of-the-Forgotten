@@ -5,6 +5,7 @@ extends CharacterBody3D
 
 const GRAVITY = 20
 @export var jump_force := 7
+const LAND_DURATION := 0.6667
 
 @export var ground_friction := 20.0
 @export var air_friction := 0.5
@@ -21,15 +22,23 @@ var InputDir : Vector2
 var last_target_yaw := 0.0 
 
 #States
-enum STATES {IDLE, WALK, RUN, JUMP}
+enum STATES {IDLE, WALK, RUN, JUMP, DODGE, LAND}
 var current_state : STATES
 
 #Rotation_modes
 enum RMODE {FREE, LOCK}
 var current_rmode : RMODE
 
-var anims := ["Idle", "Walk", "Run", "Locked", "Jump"]
-var jmp_anims := ["Jmp_start", "Jmp_idle", "Land"]
+var anims := {
+	"Idle": "idle",
+	"Walk": "walk",
+	"Run": "run",
+	"Locked": "locked",
+	"Jump": "jump",
+	"Dodge_forward": "dodge_f",
+	"Dodge_backward": "dodge_b",
+	"Locked_dodge": "dodge_blend_space"
+	}
 var current_anim : String
 
 func _ready() -> void:
@@ -57,8 +66,6 @@ func _physics_process(delta: float) -> void:
 func apply_gravity(delta) -> void:
 	if ! is_on_floor():
 		velocity.y -= GRAVITY * delta
-	else:
-		move_to_state(STATES.IDLE)
 
 
 func handle_vertical_movement(delta) -> void:
@@ -97,43 +104,51 @@ func handle_rotation(delta: float) -> void:
 	mesh.global_rotation.y = lerp_angle(mesh.global_rotation.y, last_target_yaw, mesh_rotation_speed * delta)
 
 func handle_state() -> void:
+	if current_state == STATES.LAND:
+		return   # locked until the landing finishes
 
-	if !is_on_floor():
-		move_to_state(STATES.JUMP)
-		handle_jmp_anims(jmp_anims[1])
+	if not is_on_floor():
+		enter_state(STATES.JUMP)
+	elif InputDir != Vector2.ZERO:
+		enter_state(STATES.RUN if Input.is_action_pressed("Run") else STATES.WALK)
 	else:
-		if InputDir:
-			if Input.is_action_pressed("Run"):
-				move_to_state(STATES.RUN)
-			else:
-				move_to_state(STATES.WALK)
-		else:
-			move_to_state(STATES.IDLE)
+		enter_state(STATES.IDLE)
+		
+	if Input.is_action_just_pressed("dodge"):
+		enter_state(STATES.DODGE)
 
-func move_to_state(state : STATES) -> void:
-	match state:
-			STATES.IDLE:
-				current_state = STATES.IDLE
-				current_anim = anims[0]
-			STATES.WALK:
-				current_state = STATES.WALK
-				current_anim = anims[1]
-			STATES.RUN:
-				current_state = STATES.RUN
-				if current_rmode == RMODE.FREE:
-					current_anim = anims[2]
-				else:
-					current_anim = anims[3]
-			STATES.JUMP:
-				current_state = STATES.JUMP
-				current_anim = anims[4]
+func enter_state(new_state: STATES) -> void:
+	if new_state == current_state:
+		return
+
+	exit_state(current_state)
+
+	match new_state:
+		STATES.IDLE:
+			current_anim = anims["Idle"]
+		STATES.WALK:
+			current_anim = anims["Walk"]
+		STATES.RUN:
+			current_anim = anims["Locked"] if current_rmode == RMODE.LOCK else anims["Run"]
+		STATES.JUMP:
+			current_anim = anims["Jump"]
+		STATES.DODGE:
+			if current_rmode == RMODE.LOCK:
+				current_anim = anims["Locked_dodge"]
+			else:
+				if current_state == STATES.IDLE:
+					current_anim = anims["Dodge_backward"]
+				elif current_state == STATES.WALK or current_state == STATES.RUN:
+					current_anim = anims["Dodge_forward"]
+			
+	current_state = new_state
+
+func exit_state(state : STATES) -> void:
+	pass
 
 
 func handle_anim() -> void:
 	get_tree().call_group("PlayerMesh", "travel_state", current_anim)
-
-func handle_jmp_anims(anim: String) -> void:
-	get_tree().call_group("PlayerMesh", "travel_in_jump", anim)
 
 func handle_camera_smoothness(delta : float) -> void:
 	get_tree().call_group("Camera", "cam_following", global_position, delta)

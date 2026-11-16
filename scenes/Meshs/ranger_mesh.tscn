@@ -4,32 +4,43 @@
 [ext_resource type="Script" uid="uid://g0d1chytsspr" path="res://scenes/Meshs/ranger_mesh.gd" id="2_ggdxe"]
 [ext_resource type="AnimationLibrary" uid="uid://cpdp4b65vrw7w" path="res://art/Animations/Library/PlayerAnimations.res" id="2_tfruq"]
 
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_1mb30"]
+animation = &"PlayerAnimations/Dodge_Backward"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_il1o4"]
+animation = &"PlayerAnimations/Dodge_Forward"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_s7j82"]
+animation = &"PlayerAnimations/Dodge_Backward"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_d85ea"]
+animation = &"PlayerAnimations/Dodge_Right"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_hl512"]
+animation = &"PlayerAnimations/Dodge_Left"
+
+[sub_resource type="AnimationNodeBlendSpace2D" id="AnimationNodeBlendSpace2D_uokg3"]
+blend_point_0/node = SubResource("AnimationNodeAnimation_il1o4")
+blend_point_0/pos = Vector2(0, 1)
+blend_point_0/name = &"PlayerAnimations_Dodge_Forward"
+blend_point_1/node = SubResource("AnimationNodeAnimation_s7j82")
+blend_point_1/pos = Vector2(0, -1)
+blend_point_1/name = &"PlayerAnimations_Dodge_Backward"
+blend_point_2/node = SubResource("AnimationNodeAnimation_d85ea")
+blend_point_2/pos = Vector2(1, 0)
+blend_point_2/name = &"PlayerAnimations_Dodge_Right"
+blend_point_3/node = SubResource("AnimationNodeAnimation_hl512")
+blend_point_3/pos = Vector2(-1, 0)
+blend_point_3/name = &"PlayerAnimations_Dodge_Left"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_j7tna"]
+animation = &"PlayerAnimations/Dodge_Forward"
+
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_tfruq"]
 animation = &"PlayerAnimations/Idle_A"
 
-[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_1mb30"]
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_uokg3"]
 animation = &"PlayerAnimations/Jump_Idle"
-
-[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_j7tna"]
-animation = &"PlayerAnimations/Jump_Land"
-
-[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_e06ty"]
-xfade_time = 0.2
-advance_mode = 2
-
-[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_ubrja"]
-xfade_time = 0.2
-switch_mode = 2
-
-[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_ggdxe"]
-advance_mode = 2
-
-[sub_resource type="AnimationNodeStateMachine" id="AnimationNodeStateMachine_ptofw"]
-states/Jmp_idle/node = SubResource("AnimationNodeAnimation_1mb30")
-states/Jmp_idle/position = Vector2(546, 100)
-states/Land/node = SubResource("AnimationNodeAnimation_j7tna")
-states/Land/position = Vector2(721, 100)
-transitions = ["Land", "End", SubResource("AnimationNodeStateMachineTransition_e06ty"), "Jmp_idle", "Land", SubResource("AnimationNodeStateMachineTransition_ubrja"), "Start", "Jmp_idle", SubResource("AnimationNodeStateMachineTransition_ggdxe")]
 
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_ggdxe"]
 animation = &"PlayerAnimations/Running_A"
@@ -96,70 +107,76 @@ xfade_time = 0.2
 [sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_lhrl0"]
 xfade_time = 0.2
 
-[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_whdw5"]
-xfade_time = 0.2
-
-[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_b686i"]
-xfade_time = 0.2
-
-[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_en23s"]
-xfade_time = 0.2
-
-[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_7c1tg"]
-xfade_time = 0.2
-
-[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_r768p"]
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_qq27g"]
 xfade_time = 0.2
 
 [sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_bv044"]
 xfade_time = 0.2
 
-[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_vi2jp"]
-xfade_time = 0.2
-
 [sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_4nb8t"]
 xfade_time = 0.2
 
-[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_qq27g"]
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_a3nce"]
+xfade_time = 0.2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_e06ty"]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_ubrja"]
+xfade_time = 0.2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_whdw5"]
+xfade_time = 0.2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_r768p"]
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_vi2jp"]
+xfade_time = 0.2
+switch_mode = 2
+advance_mode = 2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_6cf44"]
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_h2hv7"]
+xfade_time = 0.2
+switch_mode = 2
+advance_mode = 2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_ggdxe"]
+xfade_time = 0.2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_yvaiu"]
+xfade_time = 0.2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_tp1lj"]
+xfade_time = 0.2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_23cth"]
 xfade_time = 0.2
 
 [sub_resource type="AnimationNodeStateMachine" id="AnimationNodeStateMachine_xrivr"]
-states/Idle/node = SubResource("AnimationNodeAnimation_tfruq")
-states/Idle/position = Vector2(304, 100)
-states/Jump/node = SubResource("AnimationNodeStateMachine_ptofw")
-states/Jump/position = Vector2(682, 237)
-states/Locked/node = SubResource("AnimationNodeBlendSpace2D_pp05n")
-states/Locked/position = Vector2(446, 237)
-states/Run/node = SubResource("AnimationNodeAnimation_b00iw")
-states/Run/position = Vector2(682, -45)
-states/Walk/node = SubResource("AnimationNodeAnimation_pp05n")
-states/Walk/position = Vector2(446, -45)
-transitions = ["Start", "Idle", SubResource("AnimationNodeStateMachineTransition_b00iw"), "Idle", "Locked", SubResource("AnimationNodeStateMachineTransition_1mb30"), "Locked", "Idle", SubResource("AnimationNodeStateMachineTransition_w2uwh"), "Idle", "Walk", SubResource("AnimationNodeStateMachineTransition_j7tna"), "Walk", "Idle", SubResource("AnimationNodeStateMachineTransition_il1o4"), "Walk", "Locked", SubResource("AnimationNodeStateMachineTransition_s7j82"), "Locked", "Walk", SubResource("AnimationNodeStateMachineTransition_d85ea"), "Walk", "Run", SubResource("AnimationNodeStateMachineTransition_hl512"), "Run", "Walk", SubResource("AnimationNodeStateMachineTransition_uokg3"), "Run", "Locked", SubResource("AnimationNodeStateMachineTransition_ri00q"), "Locked", "Run", SubResource("AnimationNodeStateMachineTransition_lhrl0"), "Idle", "Jump", SubResource("AnimationNodeStateMachineTransition_whdw5"), "Jump", "Idle", SubResource("AnimationNodeStateMachineTransition_b686i"), "Walk", "Jump", SubResource("AnimationNodeStateMachineTransition_en23s"), "Jump", "Walk", SubResource("AnimationNodeStateMachineTransition_7c1tg"), "Run", "Jump", SubResource("AnimationNodeStateMachineTransition_r768p"), "Jump", "Run", SubResource("AnimationNodeStateMachineTransition_bv044"), "Locked", "Jump", SubResource("AnimationNodeStateMachineTransition_vi2jp"), "Jump", "Locked", SubResource("AnimationNodeStateMachineTransition_4nb8t"), "Run", "Idle", SubResource("AnimationNodeStateMachineTransition_qq27g")]
-graph_offset = Vector2(-104, -100)
+states/dodge_b/node = SubResource("AnimationNodeAnimation_1mb30")
+states/dodge_b/position = Vector2(207, -15)
+states/dodge_blend_space/node = SubResource("AnimationNodeBlendSpace2D_uokg3")
+states/dodge_blend_space/position = Vector2(446, 327)
+states/dodge_f/node = SubResource("AnimationNodeAnimation_j7tna")
+states/dodge_f/position = Vector2(446, -159)
+states/idle/node = SubResource("AnimationNodeAnimation_tfruq")
+states/idle/position = Vector2(304, 100)
+states/jump/node = SubResource("AnimationNodeAnimation_uokg3")
+states/jump/position = Vector2(682, 237)
+states/locked/node = SubResource("AnimationNodeBlendSpace2D_pp05n")
+states/locked/position = Vector2(446, 237)
+states/run/node = SubResource("AnimationNodeAnimation_b00iw")
+states/run/position = Vector2(682, -45)
+states/walk/node = SubResource("AnimationNodeAnimation_pp05n")
+states/walk/position = Vector2(446, -45)
+transitions = ["Start", "idle", SubResource("AnimationNodeStateMachineTransition_b00iw"), "idle", "locked", SubResource("AnimationNodeStateMachineTransition_1mb30"), "locked", "idle", SubResource("AnimationNodeStateMachineTransition_w2uwh"), "idle", "walk", SubResource("AnimationNodeStateMachineTransition_j7tna"), "walk", "idle", SubResource("AnimationNodeStateMachineTransition_il1o4"), "walk", "locked", SubResource("AnimationNodeStateMachineTransition_s7j82"), "locked", "walk", SubResource("AnimationNodeStateMachineTransition_d85ea"), "walk", "run", SubResource("AnimationNodeStateMachineTransition_hl512"), "run", "walk", SubResource("AnimationNodeStateMachineTransition_uokg3"), "run", "locked", SubResource("AnimationNodeStateMachineTransition_ri00q"), "locked", "run", SubResource("AnimationNodeStateMachineTransition_lhrl0"), "run", "idle", SubResource("AnimationNodeStateMachineTransition_qq27g"), "locked", "dodge_blend_space", SubResource("AnimationNodeStateMachineTransition_bv044"), "dodge_blend_space", "locked", SubResource("AnimationNodeStateMachineTransition_4nb8t"), "idle", "jump", SubResource("AnimationNodeStateMachineTransition_a3nce"), "locked", "jump", SubResource("AnimationNodeStateMachineTransition_e06ty"), "walk", "jump", SubResource("AnimationNodeStateMachineTransition_ubrja"), "run", "jump", SubResource("AnimationNodeStateMachineTransition_whdw5"), "walk", "dodge_f", SubResource("AnimationNodeStateMachineTransition_r768p"), "dodge_f", "walk", SubResource("AnimationNodeStateMachineTransition_vi2jp"), "idle", "dodge_b", SubResource("AnimationNodeStateMachineTransition_6cf44"), "dodge_b", "idle", SubResource("AnimationNodeStateMachineTransition_h2hv7"), "jump", "locked", SubResource("AnimationNodeStateMachineTransition_ggdxe"), "jump", "idle", SubResource("AnimationNodeStateMachineTransition_yvaiu"), "jump", "walk", SubResource("AnimationNodeStateMachineTransition_tp1lj"), "jump", "run", SubResource("AnimationNodeStateMachineTransition_23cth")]
+graph_offset = Vector2(-194, -208)
 
 [node name="RangerMesh" unique_id=1011394754 instance=ExtResource("1_pxsnc")]
 script = ExtResource("2_ggdxe")
-
-[node name="Skeleton3D" parent="Rig_Medium" parent_id_path=PackedInt32Array(1005905600) index="0" unique_id=426718321]
-bones/1/position = Vector3(0, 0.50566393, 0)
-bones/2/position = Vector3(0.17094505, 0.1135872, 1.7855621e-08)
-bones/2/rotation = Quaternion(0.95066243, 0.023711681, 0.025923882, 0.3082317)
-bones/3/rotation = Quaternion(0.60879123, 5.1442058e-08, -4.2241257e-07, 0.79333043)
-bones/4/rotation = Quaternion(-0.36361778, -0.047520626, 0.017646855, 0.93016803)
-bones/5/rotation = Quaternion(2.6600152e-05, 0.9204544, -0.39085022, -5.9030026e-06)
-bones/6/position = Vector3(-0.17094505, 0.1135872, 1.7855621e-08)
-bones/6/rotation = Quaternion(0.90056896, -0.02885506, -0.04152075, 0.43176284)
-bones/7/rotation = Quaternion(0.8142697, -4.171492e-08, 5.675865e-07, 0.5804867)
-bones/8/rotation = Quaternion(-0.593811, 0.050659798, -0.04441551, 0.8017789)
-bones/9/rotation = Quaternion(6.790784e-05, 0.92017806, -0.39150006, -1.5292379e-05)
-bones/13/rotation = Quaternion(-0.6488732, 0.37176114, 0.39684537, 0.53223205)
-bones/14/rotation = Quaternion(1.9005892e-08, 5.837329e-08, 0.5037367, 0.8638574)
-bones/16/rotation = Quaternion(-0.019008981, -0.092694566, -0.4567224, 0.8845626)
-bones/17/rotation = Quaternion(-2.2706748e-09, 7.539029e-09, 0.7071068, 0.7071067)
-bones/18/rotation = Quaternion(-0.66496044, -0.3426384, -0.3717755, 0.5497359)
-bones/19/rotation = Quaternion(1.2911908e-08, -5.1332766e-08, -0.56506604, 0.8250457)
-bones/21/rotation = Quaternion(-0.09032972, 0.047568694, 0.49032792, 0.8655382)
-bones/22/rotation = Quaternion(1.6806126e-09, 1.6806124e-09, -0.7071068, 0.7071067)
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="." index="1" unique_id=1850598247]
 libraries/PlayerAnimations = ExtResource("2_tfruq")
@@ -167,4 +184,5 @@ libraries/PlayerAnimations = ExtResource("2_tfruq")
 [node name="AnimationTree" type="AnimationTree" parent="." index="2" unique_id=482530672]
 tree_root = SubResource("AnimationNodeStateMachine_xrivr")
 anim_player = NodePath("../AnimationPlayer")
-parameters/Locked/blend_position = Vector2(0, 0)
+parameters/dodge_blend_space/blend_position = Vector2(0, 0.0025188923)
+parameters/locked/blend_position = Vector2(0, 0)
