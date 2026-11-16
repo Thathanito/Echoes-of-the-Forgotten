@@ -5,11 +5,14 @@ extends CharacterBody3D
 
 const GRAVITY = 20
 @export var jump_force := 7
-const LAND_DURATION := 0.6667
 
-@export var ground_friction := 20.0
+const DODGE_DURATION := 0.35
+var dash_strength := 10.0
+var dash_dir := Vector2.ZERO
+
+@export var ground_friction := 25.0
 @export var air_friction := 0.5
-@export var ground_accel := 15.0
+@export var ground_accel := 20.0
 @export var air_accel := 1.5
 
 var direction : Vector2
@@ -91,6 +94,19 @@ func handle_horizontal_movement(delta: float) -> void:
 		velocity.x = move_toward(velocity.x, 0.0, friction * delta)
 		velocity.z = move_toward(velocity.z, 0.0, friction * delta)
 
+
+func dash() -> void:
+	if InputDir != Vector2.ZERO:
+		dash_dir = direction.normalized()
+	else:
+		var back := -mesh.global_transform.basis.z
+		dash_dir = Vector2(back.x, back.z).normalized()
+	
+	velocity.x += dash_dir.x * dash_strength
+	velocity.z += dash_dir.y * dash_strength
+	
+	get_tree().call_group("PlayerMesh", "handle_blend_spaces", direction)
+
 func handle_rotation(delta: float) -> void:
 
 	if InputDir != Vector2.ZERO:
@@ -99,29 +115,31 @@ func handle_rotation(delta: float) -> void:
 				last_target_yaw = atan2(direction.x, direction.y)
 			RMODE.LOCK:
 				last_target_yaw = camera.global_rotation.y + PI
-				get_tree().call_group("PlayerMesh", "handle_blend_space", InputDir, delta)
+		get_tree().call_group("PlayerMesh", "handle_blend_spaces", InputDir)
 
 	mesh.global_rotation.y = lerp_angle(mesh.global_rotation.y, last_target_yaw, mesh_rotation_speed * delta)
 
-func handle_state() -> void:
-	if current_state == STATES.LAND:
-		return   # locked until the landing finishes
 
-	if not is_on_floor():
+func handle_state() -> void:
+	if current_state == STATES.DODGE:
+		return   # locked until the dodge finishes
+
+	if Input.is_action_just_pressed("dodge") and is_on_floor():
+		enter_state(STATES.DODGE)
+	elif not is_on_floor():
 		enter_state(STATES.JUMP)
 	elif InputDir != Vector2.ZERO:
 		enter_state(STATES.RUN if Input.is_action_pressed("Run") else STATES.WALK)
 	else:
 		enter_state(STATES.IDLE)
-		
-	if Input.is_action_just_pressed("dodge"):
-		enter_state(STATES.DODGE)
+
 
 func enter_state(new_state: STATES) -> void:
 	if new_state == current_state:
 		return
 
-	exit_state(current_state)
+	var prev_state := current_state
+	current_state = new_state
 
 	match new_state:
 		STATES.IDLE:
@@ -129,34 +147,35 @@ func enter_state(new_state: STATES) -> void:
 		STATES.WALK:
 			current_anim = anims["Walk"]
 		STATES.RUN:
-			current_anim = anims["Locked"] if current_rmode == RMODE.LOCK else anims["Run"]
+			current_anim =  anims["Run"]
 		STATES.JUMP:
 			current_anim = anims["Jump"]
 		STATES.DODGE:
-			if current_rmode == RMODE.LOCK:
-				current_anim = anims["Locked_dodge"]
-			else:
-				if current_state == STATES.IDLE:
-					current_anim = anims["Dodge_backward"]
-				elif current_state == STATES.WALK or current_state == STATES.RUN:
-					current_anim = anims["Dodge_forward"]
-			
-	current_state = new_state
+			dash()
+			get_tree().call_group("PlayerMesh", "fire_dodge", true)
+			_finish_dodge(prev_state)
 
-func exit_state(state : STATES) -> void:
-	pass
+
+func _finish_dodge(prev_state: STATES) -> void:
+	await get_tree().create_timer(DODGE_DURATION).timeout
+	get_tree().call_group("PlayerMesh", "fire_dodge", false)
+	enter_state(prev_state)
 
 
 func handle_anim() -> void:
 	get_tree().call_group("PlayerMesh", "travel_state", current_anim)
 
+
 func handle_camera_smoothness(delta : float) -> void:
 	get_tree().call_group("Camera", "cam_following", global_position, delta)
+
 
 func debug() -> void:
 	if Input.is_action_just_pressed("ui_accept"):
 		match current_rmode:
 			RMODE.FREE:
+				get_tree().call_group("PlayerMesh", "locomotion_mode", 1.0)
 				current_rmode = RMODE.LOCK
 			RMODE.LOCK:
+				get_tree().call_group("PlayerMesh", "locomotion_mode", 0.0)
 				current_rmode = RMODE.FREE
