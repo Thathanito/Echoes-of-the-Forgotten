@@ -2,6 +2,7 @@ extends CharacterBody3D
 
 @onready var camera: Node3D = $Camera
 @onready var mesh: Node3D = $RangerMesh
+@onready var dodge_cooldown: Timer = $DodgeCooldown
 
 const GRAVITY = 20
 @export var jump_force := 7
@@ -9,6 +10,7 @@ const GRAVITY = 20
 const DODGE_DURATION := 0.35
 var dash_strength := 10.0
 var dash_dir := Vector2.ZERO
+var can_dodge : bool = true
 
 @export var ground_friction := 25.0
 @export var air_friction := 0.5
@@ -20,12 +22,14 @@ var InputDir : Vector2
 
 @export var base_speed : int = 5
 @export var run_speed : int = 7
+@export var attack_speed : int = 3
+@export var parry_speed : int = 2
 
 @export var mesh_rotation_speed : float = 10
 var last_target_yaw := 0.0 
 
 #States
-enum STATES {IDLE, WALK, RUN, JUMP, DODGE, LAND}
+enum STATES {IDLE, WALK, RUN, JUMP, DODGE, PARRY, ATTACK}
 var current_state : STATES
 
 #Rotation_modes
@@ -37,6 +41,8 @@ var anims := {
 	"Walk": "Walk",
 	"Run": "Run",
 	"Jump": "Jump",
+	"Dodge_b" : "Dodge_b",
+	"Dodge_f" : "Dodge_f"
 	}
 var current_anim : String
 
@@ -84,7 +90,16 @@ func handle_horizontal_movement(delta: float) -> void:
 	var friction := air_friction if in_air else ground_friction
 
 	if InputDir != Vector2.ZERO:
-		var speed := run_speed if Input.is_action_pressed("Run") else base_speed
+		var speed : float
+		match current_state:
+			STATES.WALK:
+				speed = base_speed
+			STATES.RUN:
+				speed = run_speed
+			STATES.ATTACK:
+				speed = attack_speed
+			STATES.PARRY:
+				speed = parry_speed
 		velocity.x = move_toward(velocity.x, direction.x * speed, accel * delta)
 		velocity.z = move_toward(velocity.z, direction.y * speed, accel * delta)
 	else:
@@ -104,14 +119,16 @@ func dash() -> void:
 	
 
 func handle_rotation(delta: float) -> void:
-
 	if InputDir != Vector2.ZERO:
 		match current_rmode:
 			RMODE.FREE:
 				last_target_yaw = atan2(direction.x, direction.y)
 			RMODE.LOCK:
 				last_target_yaw = camera.global_rotation.y + PI
-		get_tree().call_group("PlayerMesh", "handle_blend_spaces", InputDir)
+
+	if current_rmode == RMODE.LOCK:
+		var strength := 1.0 if Input.is_action_pressed("Run") else 0.5
+		get_tree().call_group("PlayerMesh", "lock_blend_space", InputDir.normalized() * strength, delta)
 
 	mesh.global_rotation.y = lerp_angle(mesh.global_rotation.y, last_target_yaw, mesh_rotation_speed * delta)
 
@@ -120,8 +137,12 @@ func handle_state() -> void:
 	if current_state == STATES.DODGE:
 		return   # locked until the dodge finishes
 
-	if Input.is_action_just_pressed("dodge") and is_on_floor():
+	if Input.is_action_just_pressed("dodge") and is_on_floor() and can_dodge:
 		enter_state(STATES.DODGE)
+	elif Input.is_action_just_pressed("attack"):
+		enter_state(STATES.ATTACK)
+	elif Input.is_action_pressed("parry"):
+		enter_state(STATES.PARRY)
 	elif not is_on_floor():
 		enter_state(STATES.JUMP)
 	elif InputDir != Vector2.ZERO:
@@ -148,7 +169,22 @@ func enter_state(new_state: STATES) -> void:
 		STATES.JUMP:
 			current_anim = anims["Jump"]
 		STATES.DODGE:
-			pass
+			can_dodge = false
+			dodge_cooldown.start()
+			dash()
+			if current_rmode == RMODE.LOCK:
+				get_tree().call_group("PlayerMesh", "set_dodge_direction", InputDir)
+				get_tree().call_group("PlayerMesh", "trigger_action", "Dodge")
+			else: 
+				if prev_state == STATES.IDLE:
+					current_anim = anims["Dodge_b"]
+				else:
+					current_anim = anims["Dodge_f"]
+			_finish_dodge(prev_state)
+		STATES.ATTACK:
+			get_tree().call_group("PlayerMesh", "trigger_action", "Attack")
+		STATES.PARRY:
+			get_tree().call_group("PlayerMesh", "trigger_action", "Parry")
 
 
 func exit_state(state : STATES) -> void:
@@ -156,6 +192,8 @@ func exit_state(state : STATES) -> void:
 		STATES.IDLE:
 			pass
 		STATES.WALK:
+			pass
+		STATES.RUN:
 			pass
 
 
@@ -184,3 +222,7 @@ func debug() -> void:
 				current_rmode = RMODE.FREE
 	if Input.is_action_just_pressed("ui_text_delete"):
 		get_tree().call_group("PlayerMesh", "get_hit", true)
+
+
+func _on_dodge_cooldown_timeout() -> void:
+	can_dodge = true
