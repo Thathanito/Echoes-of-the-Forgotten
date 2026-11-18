@@ -33,14 +33,10 @@ enum RMODE {FREE, LOCK}
 var current_rmode : RMODE
 
 var anims := {
-	"Idle": "idle",
-	"Walk": "walk",
-	"Run": "run",
-	"Locked": "locked",
-	"Jump": "jump",
-	"Dodge_forward": "dodge_f",
-	"Dodge_backward": "dodge_b",
-	"Locked_dodge": "dodge_blend_space"
+	"Idle": "Idle",
+	"Walk": "Walk",
+	"Run": "Run",
+	"Jump": "Jump",
 	}
 var current_anim : String
 
@@ -48,6 +44,7 @@ func _ready() -> void:
 	add_to_group("Player")
 	current_state = STATES.WALK
 	current_rmode = RMODE.FREE
+	get_tree().call_group("PlayerMesh", "set_to_lock", false)
 
 
 func _physics_process(delta: float) -> void:
@@ -105,7 +102,6 @@ func dash() -> void:
 	velocity.x += dash_dir.x * dash_strength
 	velocity.z += dash_dir.y * dash_strength
 	
-	get_tree().call_group("PlayerMesh", "handle_blend_spaces", direction)
 
 func handle_rotation(delta: float) -> void:
 
@@ -140,6 +136,7 @@ func enter_state(new_state: STATES) -> void:
 
 	var prev_state := current_state
 	current_state = new_state
+	exit_state(prev_state)
 
 	match new_state:
 		STATES.IDLE:
@@ -151,9 +148,15 @@ func enter_state(new_state: STATES) -> void:
 		STATES.JUMP:
 			current_anim = anims["Jump"]
 		STATES.DODGE:
-			dash()
-			get_tree().call_group("PlayerMesh", "fire_dodge", true)
-			_finish_dodge(prev_state)
+			pass
+
+
+func exit_state(state : STATES) -> void:
+	match state:
+		STATES.IDLE:
+			pass
+		STATES.WALK:
+			pass
 
 
 func _finish_dodge(prev_state: STATES) -> void:
@@ -163,7 +166,7 @@ func _finish_dodge(prev_state: STATES) -> void:
 
 
 func handle_anim() -> void:
-	get_tree().call_group("PlayerMesh", "travel_state", current_anim)
+	get_tree().call_group("PlayerMesh", "locomotion", current_anim)
 
 
 func handle_camera_smoothness(delta : float) -> void:
@@ -171,11 +174,13 @@ func handle_camera_smoothness(delta : float) -> void:
 
 
 func debug() -> void:
-	if Input.is_action_just_pressed("ui_accept"):
+	if Input.is_action_just_pressed("toggle_lock"):
 		match current_rmode:
 			RMODE.FREE:
-				get_tree().call_group("PlayerMesh", "locomotion_mode", 1.0)
+				get_tree().call_group("PlayerMesh", "set_to_lock", true)
 				current_rmode = RMODE.LOCK
 			RMODE.LOCK:
-				get_tree().call_group("PlayerMesh", "locomotion_mode", 0.0)
+				get_tree().call_group("PlayerMesh", "set_to_lock", false)
 				current_rmode = RMODE.FREE
+	if Input.is_action_just_pressed("ui_text_delete"):
+		get_tree().call_group("PlayerMesh", "get_hit", true)
